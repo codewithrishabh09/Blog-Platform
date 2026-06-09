@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.database import users_col
-from app.models.user import UserCreate, UserLogin
+from models.user import UserCreate, UserLogin
 from app.utils.auth import hash_password, verify_password, create_token
 from bson import ObjectId
 import datetime

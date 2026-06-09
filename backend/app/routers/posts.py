@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from app.database import posts_col, likes_col
-from app.models.post import PostCreate, PostUpdate
+from models.post import PostCreate, PostUpdate
 from app.utils.auth import get_current_user
 from bson import ObjectId
 import datetime, re

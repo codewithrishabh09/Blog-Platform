@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.database import comments_col
-from app.models.comment import CommentCreate
+from models.comments import CommentCreate
 from app.utils.auth import get_current_user
 from bson import ObjectId
 import datetime
