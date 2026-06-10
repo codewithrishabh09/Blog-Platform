@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from app.database import posts_col, likes_col
-from models.post import PostCreate, PostUpdate
+from app.models.post import PostCreate, PostUpdate
 from app.utils.auth import get_current_user
 from bson import ObjectId
 import datetime, re
@@ -9,13 +9,19 @@ router = APIRouter()
 
 def slugify(title: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
-    return slug + "-" + str(int(datetime.datetime.utcnow().timestamp()))
+    return slug + "-" + str(int(datetime.datetime.now(datetime.timezone.utc).timestamp()))
 
 def fix_id(doc):
     doc["_id"] = str(doc["_id"])
     if "author_id" in doc:
         doc["author_id"] = str(doc["author_id"])
     return doc
+
+def to_oid(id: str) -> ObjectId:
+    try:
+        return ObjectId(id)
+    except Exception:
+        raise HTTPException(400, "Invalid ID")
 
 @router.get("/")
 async def list_posts(
@@ -52,15 +58,16 @@ async def get_post(slug: str):
         raise HTTPException(404, "Post not found")
     return fix_id(post)
 
-@router.post("/")
+@router.post("/", status_code=201)
 async def create_post(data: PostCreate, user=Depends(get_current_user)):
+    now = datetime.datetime.now(datetime.timezone.utc)
     post = {
-        **data.dict(),
+        **data.model_dump(),
         "slug": slugify(data.title),
         "author_id": str(user["_id"]),
         "status": "draft",
         "views": 0,
-        "created_at": datetime.datetime.utcnow(),
+        "created_at": now,
         "published_at": None,
     }
     result = await posts_col.insert_one(post)
@@ -68,11 +75,11 @@ async def create_post(data: PostCreate, user=Depends(get_current_user)):
 
 @router.put("/{id}")
 async def update_post(id: str, data: PostUpdate, user=Depends(get_current_user)):
-    updates = {k: v for k, v in data.dict().items() if v is not None}
+    updates = {k: v for k, v in data.model_dump().items() if v is not None}
     if not updates:
         raise HTTPException(400, "Nothing to update")
     result = await posts_col.update_one(
-        {"_id": ObjectId(id), "author_id": str(user["_id"])},
+        {"_id": to_oid(id), "author_id": str(user["_id"])},
         {"$set": updates},
     )
     if result.matched_count == 0:
@@ -82,7 +89,7 @@ async def update_post(id: str, data: PostUpdate, user=Depends(get_current_user))
 @router.delete("/{id}")
 async def delete_post(id: str, user=Depends(get_current_user)):
     result = await posts_col.delete_one(
-        {"_id": ObjectId(id), "author_id": str(user["_id"])}
+        {"_id": to_oid(id), "author_id": str(user["_id"])}
     )
     if result.deleted_count == 0:
         raise HTTPException(403, "Not allowed or post not found")
@@ -91,8 +98,11 @@ async def delete_post(id: str, user=Depends(get_current_user)):
 @router.post("/{id}/publish")
 async def publish_post(id: str, user=Depends(get_current_user)):
     result = await posts_col.update_one(
-        {"_id": ObjectId(id), "author_id": str(user["_id"])},
-        {"$set": {"status": "published", "published_at": datetime.datetime.utcnow()}},
+        {"_id": to_oid(id), "author_id": str(user["_id"])},
+        {"$set": {
+            "status": "published",
+            "published_at": datetime.datetime.now(datetime.timezone.utc)
+        }},
     )
     if result.matched_count == 0:
         raise HTTPException(403, "Not allowed")
@@ -105,14 +115,14 @@ async def toggle_like(id: str, user=Depends(get_current_user)):
     )
     if existing:
         await likes_col.delete_one({"_id": existing["_id"]})
-        await posts_col.update_one({"_id": ObjectId(id)}, {"$inc": {"likes": -1}})
+        await posts_col.update_one({"_id": to_oid(id)}, {"$inc": {"likes": -1}})
         return {"liked": False}
     else:
         await likes_col.insert_one({
             "user_id": str(user["_id"]),
             "target_id": id,
             "target_type": "post",
-            "created_at": datetime.datetime.utcnow(),
+            "created_at": datetime.datetime.now(datetime.timezone.utc),
         })
-        await posts_col.update_one({"_id": ObjectId(id)}, {"$inc": {"likes": 1}})
+        await posts_col.update_one({"_id": to_oid(id)}, {"$inc": {"likes": 1}})
         return {"liked": True}

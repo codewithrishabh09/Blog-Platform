@@ -1,19 +1,20 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.database import users_col
-from models.user import UserCreate, UserLogin
-from app.utils.auth import hash_password, verify_password, create_token
+from app.models.user import UserCreate, UserLogin
+from app.utils.auth import hash_password, verify_password, create_token, get_current_user
 from bson import ObjectId
 import datetime
 
 router = APIRouter()
 
-@router.post("/register")
+@router.post("/register", status_code=201)
 async def register(data: UserCreate):
     if await users_col.find_one({"email": data.email}):
         raise HTTPException(400, "Email already registered")
     if await users_col.find_one({"username": data.username}):
         raise HTTPException(400, "Username taken")
 
+    now = datetime.datetime.now(datetime.timezone.utc)
     user = {
         "email": data.email,
         "username": data.username,
@@ -21,7 +22,8 @@ async def register(data: UserCreate):
         "bio": "",
         "avatar": "",
         "role": "author",
-        "created_at": datetime.datetime.utcnow(),
+        "created_at": now,
+        "updated_at": now,
     }
     result = await users_col.insert_one(user)
     token = create_token({"sub": str(result.inserted_id)})
@@ -37,8 +39,12 @@ async def login(data: UserLogin):
     return {"access_token": token, "token_type": "bearer"}
 
 @router.get("/me")
-async def me(current_user=None):
-    from app.utils.auth import get_current_user
-    from fastapi import Depends
-    # use /me with Depends in main or call directly
-    return {"message": "use Depends(get_current_user) on this route"}
+async def get_me(current_user: dict = Depends(get_current_user)):
+    return {
+        "id": str(current_user["_id"]),
+        "email": current_user["email"],
+        "username": current_user["username"],
+        "bio": current_user.get("bio", ""),
+        "avatar": current_user.get("avatar", ""),
+        "role": current_user.get("role", "author")
+    }

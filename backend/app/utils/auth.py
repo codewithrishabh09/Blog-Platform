@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.config import settings
 from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -18,7 +18,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_token(data: dict) -> str:
     payload = data.copy()
-    payload["exp"] = datetime.utcnow() + timedelta(
+    payload["exp"] = datetime.now(timezone.utc) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
     return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
@@ -32,7 +32,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise HTTPException(401, "Invalid token")
 
-    user = await users_col.find_one({"_id": ObjectId(user_id)})
+    try:
+        oid = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(401, "Invalid token")
+
+    user = await users_col.find_one({"_id": oid})
     if not user:
         raise HTTPException(401, "User not found")
     return user
