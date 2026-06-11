@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 // Main Pages
 import Home from "../pages/Home";
@@ -25,98 +25,23 @@ import AIStudio from "../pages/AIStudio";
 
 function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
-
-        {/* Home */}
-        <Route
-          path="/"
-          element={<Home />}
-        />
-
-        {/* Authentication */}
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-        <Route
-          path="/register"
-          element={<Register />}
-        />
-
-        {/* Dashboard */}
-        <Route
-          path="/dashboard"
-          element={<Dashboard />}
-        />
-
-        {/* Profile */}
-        <Route
-          path="/profile"
-          element={<Profile />}
-        />
-
-        {/* Settings */}
-        <Route
-          path="/settings"
-          element={<Settings />}
-        />
-
-        {/* Bookmarks */}
-        <Route
-          path="/bookmarks"
-          element={<Bookmarks />}
-        />
-
-        {/* Blog */}
-        <Route
-          path="/create-post"
-          element={<CreatePost />}
-        />
-
-        <Route
-          path="/edit-post/:id"
-          element={<EditPost />}
-        />
-
-        <Route
-          path="/post/:id"
-          element={<PostDetails />}
-        />
-
-        {/* Analytics */}
-        <Route
-          path="/analytics"
-          element={<Analytics />}
-        />
-
-        {/* Notifications */}
-        <Route
-          path="/notifications"
-          element={<Notifications />}
-        />
-
-        {/* Messages */}
-        <Route
-          path="/messages"
-          element={<Messages />}
-        />
-
-        {/* Followers */}
-        <Route
-          path="/followers"
-          element={<Followers />}
-        />
-
-        {/* AI Studio */}
-        <Route
-          path="/ai-studio"
-          element={<AIStudio />}
-        />
-
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/bookmarks" element={<Bookmarks />} />
+      <Route path="/create-post" element={<CreatePost />} />
+      <Route path="/edit-post/:id" element={<EditPost />} />
+      <Route path="/post/:id" element={<PostDetails />} />
+      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/messages" element={<Messages />} />
+      <Route path="/followers" element={<Followers />} />
+      <Route path="/ai-studio" element={<AIStudio />} />
+    </Routes>
   );
 }
 

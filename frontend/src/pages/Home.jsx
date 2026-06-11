@@ -1,49 +1,53 @@
+import { useState, useEffect } from "react";
+import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
+import PostCard from "../components/posts/PostCard";
 
-import HeroSection from "../components/home/HeroSection";
-import FeaturedPost from "../components/home/FeaturedPost";
-import TrendingSection from "../components/home/TrendingSection";
-import CategoriesSection from "../components/home/CategoriesSection";
-import PopularAuthors from "../components/home/PopularAuthors";
-import Newsletter from "../components/home/Newsletter";
+export default function Home() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-import LatestBlogs from "../components/home/LatestBlogs";
-import Testimonials from "../components/home/Testimonials";
-import StatsSection from "../components/home/StatsSection";
-import FeaturedCategories from "../components/home/FeaturedCategories";
-import BlogCarousel from "../components/home/BlogCarousel";
-import CallToAction from "../components/home/CallToAction";
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await API.get("/posts");
+        setPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-function Home() {
+    fetchPosts();
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="flex justify-center items-center h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
 
-      <HeroSection />
+      <div className="max-w-4xl mx-auto p-10">
+        <h1 className="text-3xl font-bold mb-8">Latest Posts</h1>
 
-      <FeaturedPost />
-
-      <TrendingSection />
-
-      <FeaturedCategories />
-
-      <LatestBlogs />
-
-      <BlogCarousel />
-
-      <StatsSection />
-
-      <CategoriesSection />
-
-      <PopularAuthors />
-
-      <Testimonials />
-
-      <Newsletter />
-
-      <CallToAction />
+        <div className="space-y-6">
+          {posts.length === 0 ? (
+            <p className="text-gray-500">No posts found.</p>
+          ) : (
+            posts.map((post) => <PostCard key={post._id} post={post} />)
+          )}
+        </div>
+      </div>
     </>
   );
 }
-
-export default Home;
