@@ -4,7 +4,7 @@ import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
 
 export default function PostDetails() {
-  const { postId } = useParams();
+  const { id } = useParams(); // this is actually the post's slug
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -12,13 +12,13 @@ export default function PostDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchData = async () => {
       try {
-        const response = await API.get(`/posts/${postId}`);
-        setPost(response.data);
+        const postRes = await API.get(`/posts/${id}`);
+        setPost(postRes.data);
 
-        const commentsResponse = await API.get(`/posts/${postId}/comments`);
-        setComments(commentsResponse.data);
+        const commentsRes = await API.get(`/comments/${postRes.data._id}`);
+        setComments(commentsRes.data);
       } catch (error) {
         console.error("Error fetching post:", error);
       } finally {
@@ -26,15 +26,17 @@ export default function PostDetails() {
       }
     };
 
-    fetchPost();
-  }, [postId]);
+    fetchData();
+  }, [id]);
 
   const handleComment = async () => {
+    if (!newComment.trim() || !post) return;
     try {
-      const response = await API.post(`/posts/${postId}/comments`, {
-        content: newComment,
+      const res = await API.post(`/comments/${post._id}`, {
+        body: newComment,
+        parent_id: null,
       });
-      setComments([...comments, response.data]);
+      setComments([...comments, { ...res.data, body: newComment }]);
       setNewComment("");
     } catch (error) {
       console.error("Error adding comment:", error);
@@ -44,7 +46,7 @@ export default function PostDetails() {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
-        await API.delete(`/posts/${postId}`);
+        await API.delete(`/posts/${post._id}`);
         navigate("/");
       } catch (error) {
         console.error("Error deleting post:", error);
@@ -54,102 +56,133 @@ export default function PostDetails() {
 
   if (loading) {
     return (
-      <>
+      <div className="bg-[#FAF9F6] min-h-screen">
         <Navbar />
-        <div className="flex justify-center items-center h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="flex justify-center items-center h-[60vh]">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#4C4A9E] border-t-transparent"></div>
         </div>
-      </>
+      </div>
     );
   }
 
   if (!post) {
     return (
-      <>
+      <div className="bg-[#FAF9F6] min-h-screen">
         <Navbar />
-        <div className="max-w-4xl mx-auto p-10">
-          <p className="text-red-500">Post not found</p>
+        <div className="max-w-2xl mx-auto px-6 pt-24 text-center">
+          <p
+            className="text-2xl text-[#1A1A1A] mb-2"
+            style={{ fontFamily: "'Fraunces', serif" }}
+          >
+            Page not found
+          </p>
+          <p className="text-[#1A1A1A]/50">
+            This post doesn't exist or may have been removed.
+          </p>
         </div>
-      </>
+      </div>
     );
   }
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
   return (
-    <>
+    <div className="bg-[#FAF9F6] min-h-screen">
       <Navbar />
 
-      <div className="max-w-4xl mx-auto p-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-          <p className="text-gray-500 mb-4">
-            By {post.author.username} •{" "}
-            {new Date(post.createdAt).toLocaleDateString()}
-          </p>
-          <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
+      <div className="max-w-2xl mx-auto px-6 md:px-0 pt-16 pb-24">
+        <p
+          className="text-xs uppercase tracking-[0.2em] text-[#7A8B6F] mb-4"
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}
+        >
+          {post.created_at &&
+            new Date(post.created_at).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+        </p>
 
-          {user && user._id === post.author._id && (
-            <div className="mt-6 flex gap-2">
-              <button
-                onClick={() => navigate(`/edit-post/${post._id}`)}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        <h1
+          className="text-4xl md:text-5xl text-[#1A1A1A] mb-4 leading-tight"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          {post.title}
+        </h1>
+
+        <p className="text-sm text-[#1A1A1A]/50 mb-10 pb-8 border-b border-[#E8E6E0]">
+          By {post.author_username || "Unknown"}
+        </p>
+
+        <p className="text-[#1A1A1A]/85 whitespace-pre-wrap leading-relaxed text-lg mb-10">
+          {post.body}
+        </p>
+
+        <div className="flex gap-3 pb-10 mb-10 border-b border-[#E8E6E0]">
+          <button
+            onClick={() => navigate(`/edit-post/${post._id}`)}
+            className="text-sm px-4 py-1.5 rounded-full border border-[#1A1A1A]/15 text-[#1A1A1A] hover:border-[#4C4A9E] hover:text-[#4C4A9E] transition-colors duration-150"
+          >
+            Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            className="text-sm px-4 py-1.5 rounded-full border border-[#1A1A1A]/15 text-[#1A1A1A]/60 hover:border-red-400 hover:text-red-500 transition-colors duration-150"
+          >
+            Delete
+          </button>
+        </div>
+
+        <h2
+          className="text-2xl text-[#1A1A1A] mb-6"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          Comments
+        </h2>
+
+        <div className="mb-10">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="w-full p-4 bg-white border border-[#E8E6E0] rounded-lg mb-3 text-[#1A1A1A] placeholder:text-[#1A1A1A]/35 focus:outline-none focus:border-[#4C4A9E] transition-colors duration-150"
+            rows="3"
+          ></textarea>
+          <button
+            onClick={handleComment}
+            className="text-sm px-5 py-2 rounded-full bg-[#4C4A9E] text-white hover:bg-[#3D3B80] transition-colors duration-150"
+          >
+            Post comment
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {comments.length === 0 ? (
+            <p className="text-[#1A1A1A]/40 text-sm">No comments yet.</p>
+          ) : (
+            comments.map((comment) => (
+              <div
+                key={comment._id}
+                className="pb-6 border-b border-[#E8E6E0] last:border-b-0"
               >
-                Edit
-              </button>
-              <button
-                onClick={handleDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-medium text-[#1A1A1A] text-sm">
+                    {comment.author_username}
+                  </h4>
+                  <span
+                    className="text-xs text-[#1A1A1A]/40"
+                    style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                  >
+                    {comment.created_at &&
+                      new Date(comment.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className="text-[#1A1A1A]/75 leading-relaxed">
+                  {comment.body}
+                </p>
+              </div>
+            ))
           )}
         </div>
-
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Comments</h2>
-
-          <div className="mb-6">
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment..."
-              className="w-full p-3 border rounded mb-2"
-              rows="3"
-            ></textarea>
-            <button
-              onClick={handleComment}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              Post Comment
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            {comments.length === 0 ? (
-              <p className="text-gray-500">No comments yet.</p>
-            ) : (
-              comments.map((comment) => (
-                <div
-                  key={comment._id}
-                  className="p-4 border rounded-lg hover:bg-gray-50 transition"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">
-                      {comment.author.username}
-                    </h4>
-                    <span className="text-sm text-gray-500">
-                      {new Date(comment.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-gray-600">{comment.content}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 }

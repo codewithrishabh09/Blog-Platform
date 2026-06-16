@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 function PostCard({ post }) {
   return (
-    <Link to={`/post/${post._id}`}>
+    <Link to={`/post/${post.slug}`}>
       <div className="bg-white rounded-xl shadow-lg p-5 hover:-translate-y-2 transition duration-300">
 
         <img
@@ -19,7 +19,7 @@ function PostCard({ post }) {
         </h2>
 
         <p className="text-gray-500">
-          {post.author}
+          {post.author_username}
         </p>
 
       </div>

@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "../components/protection/ProtectedRoute";
 
 // Main Pages
 import Home from "../pages/Home";
@@ -26,21 +27,24 @@ import AIStudio from "../pages/AIStudio";
 function AppRoutes() {
   return (
     <Routes>
+      {/* Public */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/bookmarks" element={<Bookmarks />} />
-      <Route path="/create-post" element={<CreatePost />} />
-      <Route path="/edit-post/:id" element={<EditPost />} />
       <Route path="/post/:id" element={<PostDetails />} />
-      <Route path="/analytics" element={<Analytics />} />
-      <Route path="/notifications" element={<Notifications />} />
-      <Route path="/messages" element={<Messages />} />
-      <Route path="/followers" element={<Followers />} />
-      <Route path="/ai-studio" element={<AIStudio />} />
+
+      {/* Protected */}
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/bookmarks" element={<ProtectedRoute><Bookmarks /></ProtectedRoute>} />
+      <Route path="/create-post" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+      <Route path="/edit-post/:id" element={<ProtectedRoute><EditPost /></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+      <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+      <Route path="/followers" element={<ProtectedRoute><Followers /></ProtectedRoute>} />
+      <Route path="/ai-studio" element={<ProtectedRoute><AIStudio /></ProtectedRoute>} />
     </Routes>
   );
 }

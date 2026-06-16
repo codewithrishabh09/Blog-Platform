@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 
 export default function Register() {
@@ -7,89 +7,114 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
       const response = await API.post("/auth/register", {
         username,
         email,
         password,
-        role,
       });
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("token", response.data.access_token);
       navigate("/");
-    } catch (error) {
-      console.error("Error registering:", error);
+    } catch (err) {
+      setError(
+        err.response?.data?.detail || "Couldn't create your account. Try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6">Register</h1>
+    <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center px-6">
+      <div className="w-full max-w-sm">
+        <Link
+          to="/"
+          className="block text-center text-2xl tracking-tight text-[#1A1A1A] mb-10"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          InkVerse
+        </Link>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Username</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full p-2 border rounded"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        <div className="bg-white border border-[#E8E6E0] rounded-xl p-8">
+          <h1
+            className="text-2xl text-[#1A1A1A] mb-1"
+            style={{ fontFamily: "'Fraunces', serif" }}
           >
-            {loading ? "Registering..." : "Register"}
-          </button>
-        </form>
+            Create your account
+          </h1>
+          <p className="text-sm text-[#1A1A1A]/50 mb-6">
+            Start writing in a couple minutes.
+          </p>
+
+          {error && (
+            <p className="text-sm text-red-500 mb-4">{error}</p>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wide text-[#1A1A1A]/50 mb-1.5">
+                Username
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-3 py-2.5 bg-[#FAF9F6] border border-[#E8E6E0] rounded-lg text-[#1A1A1A] focus:outline-none focus:border-[#4C4A9E] transition-colors duration-150"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wide text-[#1A1A1A]/50 mb-1.5">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2.5 bg-[#FAF9F6] border border-[#E8E6E0] rounded-lg text-[#1A1A1A] focus:outline-none focus:border-[#4C4A9E] transition-colors duration-150"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs uppercase tracking-wide text-[#1A1A1A]/50 mb-1.5">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-3 py-2.5 bg-[#FAF9F6] border border-[#E8E6E0] rounded-lg text-[#1A1A1A] focus:outline-none focus:border-[#4C4A9E] transition-colors duration-150"
+                required
+                minLength={6}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#4C4A9E] text-white py-2.5 rounded-lg hover:bg-[#3D3B80] disabled:opacity-50 transition-colors duration-150"
+            >
+              {loading ? "Creating account…" : "Create account"}
+            </button>
+          </form>
+
+          <p className="text-sm text-[#1A1A1A]/50 mt-6 text-center">
+            Already have an account?{" "}
+            <Link to="/login" className="text-[#4C4A9E] hover:underline">
+              Log in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
