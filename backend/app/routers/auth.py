@@ -1,14 +1,17 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from app.database import users_col
 from app.models.user import UserCreate, UserLogin
 from app.utils.auth import hash_password, verify_password, create_token, get_current_user
-from bson import ObjectId
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import datetime
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 @router.post("/register", status_code=201)
-async def register(data: UserCreate):
+@limiter.limit("3/minute")
+async def register(request: Request, data: UserCreate):
     if await users_col.find_one({"email": data.email}):
         raise HTTPException(400, "Email already registered")
     if await users_col.find_one({"username": data.username}):
@@ -30,7 +33,8 @@ async def register(data: UserCreate):
     return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/login")
-async def login(data: UserLogin):
+@limiter.limit("5/minute")
+async def login(request: Request, data: UserLogin):
     user = await users_col.find_one({"email": data.email})
     if not user or not verify_password(data.password, user["password_hash"]):
         raise HTTPException(401, "Invalid credentials")
