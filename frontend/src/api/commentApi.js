@@ -1,10 +1,7 @@
 import API from "./axios";
 
 export const getComments = async (postId) => {
-  const response = await API.get(
-    `/comments/post/${postId}`
-  );
-
+  const response = await API.get(`/comments/${postId}`);
   return response.data;
 };
 

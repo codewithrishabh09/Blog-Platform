@@ -47,6 +47,14 @@ async def my_posts(user=Depends(get_current_user)):
     posts = await cursor.to_list(length=100)
     return [fix_id(p) for p in posts]
 
+@router.get("/id/{id}")
+async def get_post_by_id(id: str, user=Depends(get_current_user)):
+    """Fetch a post by its MongoDB _id (used by the edit page)."""
+    post = await posts_col.find_one({"_id": to_oid(id), "author_id": str(user["_id"])})
+    if not post:
+        raise HTTPException(404, "Post not found")
+    return fix_id(post)
+
 @router.get("/{slug}")
 async def get_post(slug: str):
     post = await posts_col.find_one_and_update(

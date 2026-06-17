@@ -7,22 +7,24 @@ export default function EditPost() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [body, setBody] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [tags, setTags] = useState("");
+  const [slug, setSlug] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await API.get(`/posts/${id}`);
+        const response = await API.get(`/posts/id/${id}`);
         const post = response.data;
 
         setTitle(post.title);
-        setContent(post.content);
-        setExcerpt(post.excerpt);
+        setBody(post.body);
+        setExcerpt(post.excerpt || "");
         setTags(post.tags ? post.tags.join(", ") : "");
+        setSlug(post.slug);
       } catch (error) {
         console.error("Error fetching post:", error);
       } finally {
@@ -40,12 +42,12 @@ export default function EditPost() {
     try {
       await API.put(`/posts/${id}`, {
         title,
-        content,
+        body,
         excerpt,
         tags: tags.split(",").map((tag) => tag.trim()),
       });
 
-      navigate(`/post/${id}`);
+      navigate(`/post/${slug}`);
     } catch (error) {
       console.error("Error updating post:", error);
     } finally {
@@ -97,8 +99,8 @@ export default function EditPost() {
           <div>
             <label className="block text-lg font-medium mb-2">Content</label>
             <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
               rows="8"
               required

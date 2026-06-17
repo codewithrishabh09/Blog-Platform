@@ -4,6 +4,7 @@ from typing import Optional, List
 class PostCreate(BaseModel):
     title: str
     body: str
+    excerpt: Optional[str] = ""
     cover_image: Optional[str] = ""
     tags: Optional[List[str]] = []
     read_time: Optional[int] = Field(1, ge=1)
@@ -34,6 +35,7 @@ class PostCreate(BaseModel):
 class PostUpdate(BaseModel):
     title: Optional[str] = None
     body: Optional[str] = None
+    excerpt: Optional[str] = None
     cover_image: Optional[str] = None
     tags: Optional[List[str]] = None
     read_time: Optional[int] = Field(None, ge=1)

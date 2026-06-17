@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
 
 export default function Followers() {
-  const { userId } = useParams();
   const [followers, setFollowers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchFollowers = async () => {
       try {
-        const response = await API.get(`/users/${userId}/followers`);
+        const response = await API.get("/followers");
         setFollowers(response.data);
       } catch (error) {
         console.error("Error fetching followers:", error);
@@ -21,7 +19,7 @@ export default function Followers() {
     };
 
     fetchFollowers();
-  }, [userId]);
+  }, []);
 
   if (loading) {
     return (

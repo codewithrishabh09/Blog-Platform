@@ -6,7 +6,7 @@ import Navbar from "../components/navbar/Navbar";
 export default function CreatePost() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [body, setBody] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [tags, setTags] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,12 +18,13 @@ export default function CreatePost() {
     try {
       const response = await API.post("/posts", {
         title,
-        content,
+        body,
         excerpt,
         tags: tags.split(",").map((tag) => tag.trim()),
       });
 
-      navigate(`/post/${response.data._id}`);
+      // Backend returns { id, slug } — navigate using slug
+      navigate(`/post/${response.data.slug}`);
     } catch (error) {
       console.error("Error creating post:", error);
     } finally {
@@ -64,8 +65,8 @@ export default function CreatePost() {
           <div>
             <label className="block text-lg font-medium mb-2">Content</label>
             <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
               rows="8"
               required

@@ -1,4 +1,5 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { motion } from "framer-motion";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 const data = [
   { name: "Jan", views: 4000, likes: 2400 },
@@ -12,17 +13,52 @@ const data = [
 
 export default function AnalyticsChart() {
   return (
-    <div className="bg-white p-6 rounded-xl shadow">
-      <h2 className="text-xl font-bold mb-4">Analytics Overview</h2>
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white border border-[#E8E6E0] rounded-xl p-6"
+    >
+      <h2
+        className="text-lg text-[#1A1A1A] mb-4"
+        style={{ fontFamily: "'Fraunces', serif" }}
+      >
+        Analytics overview
+      </h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Line type="monotone" dataKey="views" stroke="#8884d8" strokeWidth={2} />
-          <Line type="monotone" dataKey="likes" stroke="#82ca9d" strokeWidth={2} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E8E6E0" />
+          <XAxis dataKey="name" stroke="#1A1A1A" tick={{ fontSize: 12, fill: "#1A1A1A99" }} />
+          <YAxis stroke="#1A1A1A" tick={{ fontSize: 12, fill: "#1A1A1A99" }} />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #E8E6E0",
+              borderRadius: 8,
+              fontSize: 13,
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="views"
+            stroke="#4C4A9E"
+            strokeWidth={2.5}
+            dot={false}
+            isAnimationActive={true}
+            animationDuration={1200}
+          />
+          <Line
+            type="monotone"
+            dataKey="likes"
+            stroke="#7A8B6F"
+            strokeWidth={2.5}
+            dot={false}
+            isAnimationActive={true}
+            animationDuration={1200}
+            animationBegin={200}
+          />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </motion.div>
   );
 }

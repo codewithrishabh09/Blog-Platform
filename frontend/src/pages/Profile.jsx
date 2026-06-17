@@ -9,7 +9,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await API.get("/users/me");
+        const response = await API.get("/auth/me");
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching profile:", error);
