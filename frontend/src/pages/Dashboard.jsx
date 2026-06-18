@@ -15,7 +15,7 @@ import ActivityFeed from "../components/dashboard/ActivityFeed";
 
 function Dashboard() {
   const [postCount, setPostCount] = useState(0);
-
+i
   useEffect(() => {
     const fetchCount = async () => {
       try {
