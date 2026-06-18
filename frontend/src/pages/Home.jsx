@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
+import SearchBar from "../components/search/SearchBar";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,6 +14,7 @@ export default function Home() {
       try {
         const response = await API.get("/posts");
         setPosts(response.data);
+        setFilteredPosts(response.data);
       } catch (error) {
         console.error("Error fetching posts:", error);
       } finally {
@@ -39,9 +42,15 @@ export default function Home() {
         >
           Latest writing
         </h1>
-        <p className="text-[#1A1A1A]/55 mb-14">
+        <p className="text-[#1A1A1A]/55 mb-8">
           Fresh entries from people putting thoughts into words.
         </p>
+
+        {!loading && posts.length > 0 && (
+          <div className="mb-10">
+            <SearchBar posts={posts} setFiltered={setFilteredPosts} />
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-24">
@@ -59,9 +68,13 @@ export default function Home() {
               Write the first post →
             </Link>
           </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="border-t border-[#E8E6E0] py-16 text-center">
+            <p className="text-[#1A1A1A]/50">No posts match your search.</p>
+          </div>
         ) : (
           <div className="border-t border-[#E8E6E0]">
-            {posts.map((post) => (
+            {filteredPosts.map((post) => (
               <Link
                 key={post._id}
                 to={`/post/${post.slug}`}

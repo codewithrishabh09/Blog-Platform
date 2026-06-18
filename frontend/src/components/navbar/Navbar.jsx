@@ -1,7 +1,46 @@
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import API from "../../api/axios";
+import useAuthStore from "../../store/authStore";
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, login, logout } = useAuthStore();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const rehydrate = async () => {
+      const token = localStorage.getItem("token");
+      if (token && !user) {
+        try {
+          const res = await API.get("/auth/me");
+          login(res.data);
+        } catch {
+          localStorage.removeItem("token");
+        }
+      }
+    };
+    rehydrate();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    logout();
+    setDropdownOpen(false);
+    navigate("/");
+  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -26,12 +65,42 @@ function Navbar() {
         <Link to="/" className={linkClass("/")}>Home</Link>
         <Link to="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
         <Link to="/create-post" className={linkClass("/create-post")}>Write</Link>
-        <Link
-          to="/login"
-          className="text-sm px-4 py-1.5 rounded-full border border-[#1A1A1A]/15 text-[#1A1A1A] hover:border-[#4C4A9E] hover:text-[#4C4A9E] transition-colors duration-150"
-        >
-          Login
-        </Link>
+
+        {user ? (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="text-sm px-4 py-1.5 rounded-full border border-[#1A1A1A]/15 text-[#1A1A1A] hover:border-[#4C4A9E] hover:text-[#4C4A9E] transition-colors duration-150"
+            >
+              {user.username}
+            </button>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white border border-[#E8E6E0] rounded-lg shadow-md py-1.5 overflow-hidden">
+                <Link
+                  to="/profile"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block px-4 py-2 text-sm text-[#1A1A1A]/80 hover:bg-[#F4F2EC] transition-colors duration-150"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-[#F4F2EC] transition-colors duration-150"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            to="/login"
+            className="text-sm px-4 py-1.5 rounded-full border border-[#1A1A1A]/15 text-[#1A1A1A] hover:border-[#4C4A9E] hover:text-[#4C4A9E] transition-colors duration-150"
+          >
+            Login
+          </Link>
+        )}
       </div>
     </nav>
   );

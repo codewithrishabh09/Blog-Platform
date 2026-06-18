@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
+import useAuthStore from "../store/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,6 +19,10 @@ export default function Login() {
     try {
       const response = await API.post("/auth/login", { email, password });
       localStorage.setItem("token", response.data.access_token);
+
+      const me = await API.get("/auth/me");
+      login(me.data);
+
       navigate("/");
     } catch (err) {
       setError(
@@ -49,9 +55,7 @@ export default function Login() {
             Log in to keep writing.
           </p>
 
-          {error && (
-            <p className="text-sm text-red-500 mb-4">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
