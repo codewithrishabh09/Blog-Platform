@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
+import BookmarkCard from "../components/bookmarks/BookmarkCard";
 
 export default function Bookmarks() {
-  const [bookmarks, setBookmarks] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBookmarks = async () => {
       try {
-        const response = await API.get("/bookmarks");
-        setBookmarks(response.data);
+        const res = await API.get("/bookmarks/");
+        setPosts(res.data);
       } catch (error) {
         console.error("Error fetching bookmarks:", error);
       } finally {
@@ -21,65 +23,44 @@ export default function Bookmarks() {
     fetchBookmarks();
   }, []);
 
-  const removeBookmark = async (postId) => {
-    try {
-      await API.delete(`/bookmarks/${postId}`);
-      setBookmarks(bookmarks.filter((b) => b.post._id !== postId));
-    } catch (error) {
-      console.error("Error removing bookmark:", error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <div className="flex justify-center items-center h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      </>
-    );
-  }
-
   return (
-    <>
+    <div className="bg-[#FAF9F6] min-h-screen">
       <Navbar />
 
-      <div className="max-w-4xl mx-auto p-10">
-        <h1 className="text-3xl font-bold mb-8">Bookmarks</h1>
+      <div className="max-w-3xl mx-auto px-6 md:px-0 pt-16 pb-24">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-xs uppercase tracking-[0.2em] text-[#7A8B6F] mb-3"
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}
+        >
+          Saved
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-4xl text-[#1A1A1A] mb-10"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          Bookmarks
+        </motion.h1>
 
-        <div className="space-y-4">
-          {bookmarks.length === 0 ? (
-            <p className="text-gray-500">No bookmarks yet.</p>
-          ) : (
-            bookmarks.map((bookmark) => (
-              <div
-                key={bookmark.post._id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition"
-              >
-                <a
-                  href={`/post/${bookmark.post._id}`}
-                  className="flex-1"
-                >
-                  <h3 className="font-semibold text-lg">
-                    {bookmark.post.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm">
-                    {bookmark.post.excerpt}
-                  </p>
-                </a>
-
-                <button
-                  onClick={() => removeBookmark(bookmark.post._id)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Remove
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-24">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#4C4A9E] border-t-transparent"></div>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="border-t border-[#E8E6E0] py-16 text-center">
+            <p className="text-[#1A1A1A]/50">No bookmarks yet.</p>
+          </div>
+        ) : (
+          <div className="border-t border-[#E8E6E0]">
+            {posts.map((post, i) => (
+              <BookmarkCard key={post._id} post={post} index={i} />
+            ))}
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }

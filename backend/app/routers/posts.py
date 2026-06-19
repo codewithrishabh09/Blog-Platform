@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-from app.database import posts_col, likes_col
+from app.database import posts_col, likes_col, notifications_col
 from app.models.post import PostCreate, PostUpdate
 from app.utils.auth import get_current_user
 from bson import ObjectId
@@ -133,4 +133,19 @@ async def toggle_like(id: str, user=Depends(get_current_user)):
             "created_at": datetime.datetime.now(datetime.timezone.utc),
         })
         await posts_col.update_one({"_id": to_oid(id)}, {"$inc": {"likes": 1}})
+
+        # create notification for post author
+        post = await posts_col.find_one({"_id": to_oid(id)})
+        if post and post["author_id"] != str(user["_id"]):
+            await notifications_col.insert_one({
+                "recipient_id": post["author_id"],
+                "sender_id": str(user["_id"]),
+                "sender_username": user["username"],
+                "type": "like",
+                "post_id": id,
+                "post_title": post.get("title", ""),
+                "read": False,
+                "created_at": datetime.datetime.now(datetime.timezone.utc),
+            })
+
         return {"liked": True}

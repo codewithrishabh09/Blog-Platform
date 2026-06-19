@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.database import comments_col
+from app.database import comments_col, notifications_col, posts_col
 from app.models.comments import CommentCreate
 from app.utils.auth import get_current_user
 from bson import ObjectId
@@ -29,6 +29,21 @@ async def add_comment(post_id: str, data: CommentCreate, user=Depends(get_curren
         "created_at": datetime.datetime.now(datetime.timezone.utc),
     }
     result = await comments_col.insert_one(comment)
+
+    # create notification for post author
+    post = await posts_col.find_one({"_id": ObjectId(post_id)})
+    if post and post["author_id"] != str(user["_id"]):
+        await notifications_col.insert_one({
+            "recipient_id": post["author_id"],
+            "sender_id": str(user["_id"]),
+            "sender_username": user["username"],
+            "type": "comment",
+            "post_id": post_id,
+            "post_title": post.get("title", ""),
+            "read": False,
+            "created_at": datetime.datetime.now(datetime.timezone.utc),
+        })
+
     return {"id": str(result.inserted_id)}
 
 @router.delete("/{comment_id}")

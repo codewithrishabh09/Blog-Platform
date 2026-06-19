@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../../api/axios";
 import useAuthStore from "../../store/authStore";
+import NotificationBell from "../notifications/NotificationBell";
 
 function Navbar() {
   const location = useLocation();
@@ -45,10 +46,9 @@ function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   const linkClass = (path) =>
-    `text-sm transition-colors duration-150 ${
-      isActive(path)
-        ? "text-[#1A1A1A] font-medium"
-        : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
+    `text-sm transition-colors duration-150 ${isActive(path)
+      ? "text-[#1A1A1A] font-medium"
+      : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
     }`;
 
   return (
@@ -65,6 +65,9 @@ function Navbar() {
         <Link to="/" className={linkClass("/")}>Home</Link>
         <Link to="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
         <Link to="/create-post" className={linkClass("/create-post")}>Write</Link>
+        <Link to="/bookmarks" className={linkClass("/bookmarks")}>Bookmarks</Link>
+
+        <NotificationBell />
 
         {user ? (
           <div className="relative" ref={dropdownRef}>
@@ -83,6 +86,13 @@ function Navbar() {
                   className="block px-4 py-2 text-sm text-[#1A1A1A]/80 hover:bg-[#F4F2EC] transition-colors duration-150"
                 >
                   Profile
+                </Link>
+                <Link
+                  to="/bookmarks"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block px-4 py-2 text-sm text-[#1A1A1A]/80 hover:bg-[#F4F2EC] transition-colors duration-150"
+                >
+                  Bookmarks
                 </Link>
                 <button
                   onClick={handleLogout}

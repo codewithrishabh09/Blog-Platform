@@ -7,6 +7,7 @@ import Dashboard from "../pages/Dashboard";
 import Profile from "../pages/Profile";
 import Settings from "../pages/Settings";
 import Bookmarks from "../pages/Bookmarks";
+import CategoryPosts from "../pages/CategoryPosts";
 
 // Auth Pages
 import Login from "../pages/Login";
@@ -32,6 +33,7 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/post/:id" element={<PostDetails />} />
+      <Route path="/category/:tag" element={<CategoryPosts />} />
 
       {/* Protected */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
+import CommentForm from "../components/comments/CommentForm";
+import CommentList from "../components/comments/CommentList";
+import BookmarkButton from "../components/bookmarks/BookmarkButton";
 
 export default function PostDetails() {
-  const { id } = useParams(); // this is actually the post's slug
+  const { id } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,15 +31,14 @@ export default function PostDetails() {
     fetchData();
   }, [id]);
 
-  const handleComment = async () => {
-    if (!newComment.trim() || !post) return;
+  const handleComment = async (commentText) => {
+    if (!post) return;
     try {
       const res = await API.post(`/comments/${post._id}`, {
-        body: newComment,
+        body: commentText,
         parent_id: null,
       });
-      setComments([...comments, { ...res.data, body: newComment }]);
-      setNewComment("");
+      setComments([...comments, { ...res.data, body: commentText }]);
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -129,6 +130,7 @@ export default function PostDetails() {
           >
             Delete
           </button>
+          <BookmarkButton postId={post._id} />
         </div>
 
         <h2
@@ -138,50 +140,8 @@ export default function PostDetails() {
           Comments
         </h2>
 
-        <div className="mb-10">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a comment..."
-            className="w-full p-4 bg-white border border-[#E8E6E0] rounded-lg mb-3 text-[#1A1A1A] placeholder:text-[#1A1A1A]/35 focus:outline-none focus:border-[#4C4A9E] transition-colors duration-150"
-            rows="3"
-          ></textarea>
-          <button
-            onClick={handleComment}
-            className="text-sm px-5 py-2 rounded-full bg-[#4C4A9E] text-white hover:bg-[#3D3B80] transition-colors duration-150"
-          >
-            Post comment
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          {comments.length === 0 ? (
-            <p className="text-[#1A1A1A]/40 text-sm">No comments yet.</p>
-          ) : (
-            comments.map((comment) => (
-              <div
-                key={comment._id}
-                className="pb-6 border-b border-[#E8E6E0] last:border-b-0"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-[#1A1A1A] text-sm">
-                    {comment.author_username}
-                  </h4>
-                  <span
-                    className="text-xs text-[#1A1A1A]/40"
-                    style={{ fontFamily: "'JetBrains Mono', monospace" }}
-                  >
-                    {comment.created_at &&
-                      new Date(comment.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className="text-[#1A1A1A]/75 leading-relaxed">
-                  {comment.body}
-                </p>
-              </div>
-            ))
-          )}
-        </div>
+        <CommentForm onSubmit={handleComment} />
+        <CommentList comments={comments} />
       </div>
     </div>
   );

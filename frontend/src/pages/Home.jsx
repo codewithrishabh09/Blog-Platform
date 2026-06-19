@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
 import SearchBar from "../components/search/SearchBar";
+import CallToAction from "../components/home/CallToAction";
+import CategoriesSection from "../components/home/CategoriesSection";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -29,7 +31,7 @@ export default function Home() {
     <div className="bg-[#FAF9F6] min-h-screen">
       <Navbar />
 
-      <div className="max-w-3xl mx-auto px-6 md:px-0 pt-16 pb-24">
+      <div className="max-w-3xl mx-auto px-6 md:px-0 pt-16 pb-12">
         <p
           className="text-xs uppercase tracking-[0.2em] text-[#7A8B6F] mb-3"
           style={{ fontFamily: "'JetBrains Mono', monospace" }}
@@ -86,8 +88,8 @@ export default function Home() {
                 >
                   {post.published_at
                     ? new Date(post.published_at).toLocaleDateString("en-US", {
-                        month: "short",
-                      })
+                      month: "short",
+                    })
                     : "—"}
                   <span className="text-base text-[#1A1A1A] not-italic font-medium">
                     {post.published_at
@@ -123,6 +125,8 @@ export default function Home() {
           </div>
         )}
       </div>
+      <CategoriesSection />
+      <CallToAction />
     </div>
   );
 }
