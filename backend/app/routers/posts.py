@@ -41,6 +41,14 @@ async def list_posts(
     posts = await cursor.to_list(length=limit)
     return [fix_id(p) for p in posts]
 
+@router.get("/trending/top")
+async def trending_posts(limit: int = 4):
+    cursor = posts_col.find(
+        {"status": "published"}
+    ).sort("views", -1).limit(limit)
+    posts = await cursor.to_list(length=limit)
+    return [fix_id(p) for p in posts]
+
 @router.get("/my")
 async def my_posts(user=Depends(get_current_user)):
     cursor = posts_col.find({"author_id": str(user["_id"])}).sort("created_at", -1)

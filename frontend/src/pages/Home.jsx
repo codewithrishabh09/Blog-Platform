@@ -3,8 +3,14 @@ import { Link } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/navbar/Navbar";
 import SearchBar from "../components/search/SearchBar";
-import CallToAction from "../components/home/CallToAction";
+import FeaturedPost from "../components/home/FeaturedPost";
+import TrendingSection from "../components/home/TrendingSection";
 import CategoriesSection from "../components/home/CategoriesSection";
+import PopularAuthors from "../components/home/PopularAuthors";
+import StatsSection from "../components/home/StatsSection";
+import Testimonials from "../components/home/Testimonials";
+import Newsletter from "../components/home/Newsletter";
+import CallToAction from "../components/home/CallToAction";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -27,11 +33,20 @@ export default function Home() {
     fetchPosts();
   }, []);
 
+  const featuredPost = posts[0];
+  const restOfPosts = filteredPosts.filter(
+    (p) => p._id !== featuredPost?._id
+  );
+
   return (
     <div className="bg-[#FAF9F6] min-h-screen">
       <Navbar />
 
-      <div className="max-w-3xl mx-auto px-6 md:px-0 pt-16 pb-12">
+      {!loading && featuredPost && <FeaturedPost post={featuredPost} />}
+
+      <TrendingSection />
+
+      <div className="max-w-3xl mx-auto px-6 md:px-0 pb-12">
         <p
           className="text-xs uppercase tracking-[0.2em] text-[#7A8B6F] mb-3"
           style={{ fontFamily: "'JetBrains Mono', monospace" }}
@@ -70,13 +85,13 @@ export default function Home() {
               Write the first post →
             </Link>
           </div>
-        ) : filteredPosts.length === 0 ? (
+        ) : restOfPosts.length === 0 ? (
           <div className="border-t border-[#E8E6E0] py-16 text-center">
             <p className="text-[#1A1A1A]/50">No posts match your search.</p>
           </div>
         ) : (
           <div className="border-t border-[#E8E6E0]">
-            {filteredPosts.map((post) => (
+            {restOfPosts.map((post) => (
               <Link
                 key={post._id}
                 to={`/post/${post.slug}`}
@@ -125,7 +140,12 @@ export default function Home() {
           </div>
         )}
       </div>
+
       <CategoriesSection />
+      <PopularAuthors />
+      <StatsSection />
+      <Testimonials />
+      <Newsletter />
       <CallToAction />
     </div>
   );

@@ -1,47 +1,70 @@
-function StatsSection() {
+import { useEffect, useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+
+function useCountUp(target, inView, duration = 1200) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let frame;
+    const start = performance.now();
+
+    const tick = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      setValue(Math.floor(progress * target));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [inView, target, duration]);
+
+  return value;
+}
+
+function StatItem({ value, suffix, label, delay }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+  const count = useCountUp(value, inView);
+
   return (
-    <section className="bg-blue-600 text-white py-20">
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, delay }}
+    >
+      <p
+        className="text-5xl text-[#1A1A1A] mb-2"
+        style={{ fontFamily: "'Fraunces', serif" }}
+      >
+        {count}
+        {suffix}
+      </p>
+      <p
+        className="text-xs uppercase tracking-wide text-[#1A1A1A]/50"
+        style={{ fontFamily: "'JetBrains Mono', monospace" }}
+      >
+        {label}
+      </p>
+    </motion.div>
+  );
+}
 
-      <div className="max-w-7xl mx-auto px-6">
+function StatsSection() {
+  const stats = [
+    { value: 500, suffix: "+", label: "Blogs" },
+    { value: 10, suffix: "K+", label: "Readers" },
+    { value: 2, suffix: "K+", label: "Authors" },
+    { value: 50, suffix: "K+", label: "Views" },
+  ];
 
-        <div className="grid md:grid-cols-4 gap-8 text-center">
-
-          <div>
-            <h2 className="text-5xl font-bold">
-              500+
-            </h2>
-
-            <p>Blogs</p>
-          </div>
-
-          <div>
-            <h2 className="text-5xl font-bold">
-              10K+
-            </h2>
-
-            <p>Readers</p>
-          </div>
-
-          <div>
-            <h2 className="text-5xl font-bold">
-              2K+
-            </h2>
-
-            <p>Authors</p>
-          </div>
-
-          <div>
-            <h2 className="text-5xl font-bold">
-              50K+
-            </h2>
-
-            <p>Views</p>
-          </div>
-
-        </div>
-
+  return (
+    <section className="max-w-3xl mx-auto px-6 md:px-0 py-16 border-t border-[#E8E6E0]">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        {stats.map((stat, i) => (
+          <StatItem key={stat.label} {...stat} delay={i * 0.1} />
+        ))}
       </div>
-
     </section>
   );
 }
