@@ -40,7 +40,7 @@ function TrendingSection() {
           >
             <Link
               to={`/post/${post.slug}`}
-              className="group flex items-center justify-between bg-white/50 backdrop-blur-sm border border-[#E8E6E0] rounded-xl p-5 hover:border-[#4C4A9E]/30 hover:bg-white hover:shadow-lg hover:shadow-[#4C4A9E]/5 transition-all duration-300 hover:-translate-y-0.5"
+              className="group flex items-center justify-between bg-white border border-[#E8E6E0] rounded-xl p-5 hover:border-[#4C4A9E] transition-colors duration-150"
             >
               <span className="text-sm text-[#1A1A1A]/80 group-hover:text-[#4C4A9E] transition-colors duration-150 truncate pr-3">
                 {post.title}

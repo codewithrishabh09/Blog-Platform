@@ -26,12 +26,10 @@ function Newsletter() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-[#1A1A1A] via-[#2A2A35] to-[#4C4A9E] relative overflow-hidden text-white p-12 rounded-[2rem] text-center shadow-2xl"
+        className="bg-[#1A1A1A] text-white p-10 rounded-2xl text-center"
       >
-        <div className="absolute top-0 right-0 -mr-24 -mt-24 w-64 h-64 rounded-full bg-[#7A8B6F] opacity-30 blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-64 h-64 rounded-full bg-[#4C4A9E] opacity-40 blur-3xl pointer-events-none"></div>
         <h2
-          className="text-3xl md:text-4xl mb-4 relative z-10"
+          className="text-3xl mb-3"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
           Stay in the loop

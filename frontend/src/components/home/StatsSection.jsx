@@ -34,7 +34,7 @@ function StatItem({ value, suffix, label, delay }) {
       transition={{ duration: 0.4, delay }}
     >
       <p
-        className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#1A1A1A] to-[#4C4A9E] mb-2"
+        className="text-5xl text-[#1A1A1A] mb-2"
         style={{ fontFamily: "'Fraunces', serif" }}
       >
         {count}

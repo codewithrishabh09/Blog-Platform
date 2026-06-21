@@ -34,7 +34,7 @@ function CallToAction() {
         >
           <Link
             to="/create-post"
-            className="inline-block bg-gradient-to-r from-[#4C4A9E] to-[#605EAA] text-white font-medium px-8 py-3 rounded-full shadow-lg shadow-[#4C4A9E]/20 hover:shadow-xl hover:shadow-[#4C4A9E]/40 hover:-translate-y-0.5 transition-all duration-300"
+            className="inline-block bg-[#4C4A9E] text-white px-6 py-2.5 rounded-full hover:bg-[#3D3B80] transition-colors duration-150"
           >
             Write your first post
           </Link>

@@ -90,15 +90,15 @@ export default function Home() {
             <p className="text-[#1A1A1A]/50">No posts match your search.</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="border-t border-[#E8E6E0]">
             {restOfPosts.map((post) => (
               <Link
                 key={post._id}
                 to={`/post/${post.slug}`}
-                className="group flex items-start gap-6 py-6 px-5 -mx-5 rounded-2xl hover:bg-white hover:shadow-xl hover:shadow-[#4C4A9E]/5 border border-transparent hover:border-[#E8E6E0] transition-all duration-300 hover:-translate-y-0.5"
+                className="group flex items-start gap-5 py-6 border-b border-[#E8E6E0] hover:bg-[#F4F2EC] transition-colors duration-150 px-2 -mx-2 rounded-md"
               >
                 <span
-                  className="hidden sm:flex flex-col items-center justify-center text-center text-[10px] uppercase text-[#7A8B6F]/80 w-12 shrink-0 pt-1 group-hover:text-[#4C4A9E] transition-colors duration-300"
+                  className="hidden sm:flex flex-col items-center justify-center text-center text-[10px] uppercase text-[#7A8B6F]/80 w-12 shrink-0 pt-1"
                   style={{ fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   {post.published_at
@@ -106,7 +106,7 @@ export default function Home() {
                       month: "short",
                     })
                     : "—"}
-                  <span className="text-base text-[#1A1A1A] not-italic font-medium mt-1">
+                  <span className="text-base text-[#1A1A1A] not-italic font-medium">
                     {post.published_at
                       ? new Date(post.published_at).getDate()
                       : "·"}
@@ -114,18 +114,16 @@ export default function Home() {
                 </span>
 
                 {post.image && (
-                  <div className="overflow-hidden rounded-xl shrink-0">
-                    <img
-                      src={post.image}
-                      alt=""
-                      className="w-20 h-20 object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
+                  <img
+                    src={post.image}
+                    alt=""
+                    className="w-16 h-16 rounded object-cover shrink-0"
+                  />
                 )}
 
                 <div className="flex-1 min-w-0">
                   <h2
-                    className="text-2xl text-[#1A1A1A] group-hover:text-[#4C4A9E] transition-colors duration-300 mb-1"
+                    className="text-xl text-[#1A1A1A] group-hover:text-[#4C4A9E] transition-colors duration-150 mb-1"
                     style={{ fontFamily: "'Fraunces', serif" }}
                   >
                     {post.title}
@@ -133,9 +131,7 @@ export default function Home() {
                   <p className="text-sm text-[#1A1A1A]/50">
                     {post.author_username || "Unknown"}
                     {post.tags && post.tags.length > 0 && (
-                      <span className="ml-1 text-[#7A8B6F] opacity-80 group-hover:opacity-100 transition-opacity">
-                        · {post.tags.slice(0, 2).join(", ")}
-                      </span>
+                      <span> · {post.tags.slice(0, 2).join(", ")}</span>
                     )}
                   </p>
                 </div>
