@@ -30,10 +30,10 @@ export default function CategoriesSection() {
           >
             <Link
               to={`/category/${category.name.toLowerCase()}`}
-              className="block bg-white border border-[#E8E6E0] p-4 rounded-xl hover:border-[#4C4A9E] transition-colors duration-150 text-center"
+              className="block bg-white/60 backdrop-blur-md border border-[#E8E6E0] p-4 rounded-xl hover:border-[#4C4A9E]/40 hover:bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center group"
             >
-              <div className="text-2xl mb-2">{category.icon}</div>
-              <h3 className="text-xs text-[#1A1A1A]/70">{category.name}</h3>
+              <div className="text-2xl mb-2 group-hover:scale-110 transition-transform duration-300">{category.icon}</div>
+              <h3 className="text-xs font-medium text-[#1A1A1A]/70 group-hover:text-[#4C4A9E] transition-colors">{category.name}</h3>
             </Link>
           </motion.div>
         ))}

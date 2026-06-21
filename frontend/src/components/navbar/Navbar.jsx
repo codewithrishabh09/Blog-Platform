@@ -9,6 +9,7 @@ function Navbar() {
   const navigate = useNavigate();
   const { user, login, logout } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -53,19 +54,37 @@ function Navbar() {
 
   return (
     <nav className="bg-[#FAF9F6] border-b border-[#E8E6E0] px-6 md:px-10 py-4 flex items-center justify-between sticky top-0 z-50">
-      <Link
-        to="/"
-        className="text-2xl tracking-tight text-[#1A1A1A]"
-        style={{ fontFamily: "'Fraunces', serif" }}
-      >
-        InkVerse
-      </Link>
+      <div className="flex items-center gap-4">
+        <button
+          className="md:hidden text-[#1A1A1A] hover:text-[#4C4A9E] focus:outline-none"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {mobileMenuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
 
-      <div className="flex items-center gap-7">
-        <Link to="/" className={linkClass("/")}>Home</Link>
-        <Link to="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
-        <Link to="/create-post" className={linkClass("/create-post")}>Write</Link>
-        <Link to="/bookmarks" className={linkClass("/bookmarks")}>Bookmarks</Link>
+        <Link
+          to="/"
+          className="text-2xl tracking-tight text-[#1A1A1A]"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          InkVerse
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-4 md:gap-7">
+        <div className="hidden md:flex items-center gap-7">
+          <Link to="/" className={linkClass("/")}>Home</Link>
+          <Link to="/dashboard" className={linkClass("/dashboard")}>Dashboard</Link>
+          <Link to="/create-post" className={linkClass("/create-post")}>Write</Link>
+          <Link to="/bookmarks" className={linkClass("/bookmarks")}>Bookmarks</Link>
+          <Link to="/messages" className={linkClass("/messages")}>Messages</Link>
+        </div>
 
         <NotificationBell />
 
@@ -112,6 +131,16 @@ function Navbar() {
           </Link>
         )}
       </div>
+
+      {mobileMenuOpen && (
+        <div className="absolute top-full left-0 w-full bg-[#FAF9F6] border-b border-[#E8E6E0] md:hidden flex flex-col px-6 py-4 gap-4 shadow-lg">
+          <Link to="/" className={linkClass("/")} onClick={() => setMobileMenuOpen(false)}>Home</Link>
+          <Link to="/dashboard" className={linkClass("/dashboard")} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+          <Link to="/create-post" className={linkClass("/create-post")} onClick={() => setMobileMenuOpen(false)}>Write</Link>
+          <Link to="/bookmarks" className={linkClass("/bookmarks")} onClick={() => setMobileMenuOpen(false)}>Bookmarks</Link>
+          <Link to="/messages" className={linkClass("/messages")} onClick={() => setMobileMenuOpen(false)}>Messages</Link>
+        </div>
+      )}
     </nav>
   );
 }

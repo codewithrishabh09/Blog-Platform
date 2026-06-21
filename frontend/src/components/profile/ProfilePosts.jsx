@@ -28,7 +28,7 @@ function ProfilePosts({ posts }) {
           {posts.map((post) => (
             <Link
               key={post._id}
-              to={`/post/${post.slug}`}
+              to={post.status === "published" ? `/post/${post.slug}` : `/edit-post/${post._id}`}
               className="flex items-center justify-between py-3 border-b border-[#E8E6E0] last:border-b-0 group"
             >
               <span className="text-sm text-[#1A1A1A]/80 group-hover:text-[#4C4A9E] transition-colors duration-150">

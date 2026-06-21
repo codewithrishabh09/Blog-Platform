@@ -33,13 +33,15 @@ function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: i * 0.1 }}
-            className="bg-white border border-[#E8E6E0] rounded-xl p-6"
+            className="group bg-white/60 backdrop-blur-md border border-[#E8E6E0] rounded-2xl p-8 hover:border-[#4C4A9E]/30 hover:bg-white hover:shadow-xl hover:shadow-[#4C4A9E]/5 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
           >
-            <p className="text-[#1A1A1A]/80 leading-relaxed mb-4">
+            {/* Quote badge decoration */}
+            <div className="absolute top-4 right-4 text-4xl text-[#4C4A9E]/10 font-serif leading-none">"</div>
+            <p className="text-[#1A1A1A]/85 leading-relaxed mb-6 font-medium relative z-10">
               "{t.quote}"
             </p>
             <p
-              className="text-sm text-[#1A1A1A]/50"
+              className="text-sm text-[#4C4A9E] font-medium tracking-wide relative z-10"
               style={{ fontFamily: "'JetBrains Mono', monospace" }}
             >
               — {t.name}

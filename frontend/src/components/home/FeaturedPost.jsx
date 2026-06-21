@@ -9,18 +9,21 @@ function FeaturedPost({ post }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-3xl mx-auto px-6 md:px-0 mb-16"
+      className="max-w-3xl mx-auto px-6 md:px-0 mt-12 mb-16"
     >
       <Link
         to={`/post/${post.slug}`}
-        className="group block bg-white border border-[#E8E6E0] rounded-2xl overflow-hidden hover:border-[#4C4A9E] transition-colors duration-150"
+        className="group block bg-white border border-[#E8E6E0] rounded-2xl overflow-hidden hover:border-[#4C4A9E]/30 hover:shadow-2xl hover:shadow-[#4C4A9E]/10 transition-all duration-500 hover:-translate-y-1"
       >
         {post.image && (
-          <img
-            src={post.image}
-            alt=""
-            className="w-full h-72 object-cover"
-          />
+          <div className="overflow-hidden h-72 relative">
+            <img
+              src={post.image}
+              alt=""
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          </div>
         )}
 
         <div className="p-8">
