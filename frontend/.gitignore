@@ -25,3 +25,31 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+
+# Environment Variables
+.env
+
+# Build Outputs
+dist/
+build/
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS Files
+.DS_Store
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project Specific
+backend/.env
+frontend/.env
