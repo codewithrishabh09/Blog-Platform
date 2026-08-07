@@ -64,12 +64,17 @@ async def get_post_by_id(id: str, user=Depends(get_current_user)):
     return fix_id(post)
 
 @router.get("/{slug}")
-async def get_post(slug: str):
+async def get_post(slug: str, user=Depends(get_current_user)):
     post = await posts_col.find_one_and_update(
-        {"slug": slug, "status": "published"},
+        {"slug": slug},
         {"$inc": {"views": 1}},
         return_document=True,
     )
+
+    if not post:
+        raise HTTPException(403, "You are not allowed to view this post")
+    
+    # only author or published posts can be viewed
     if not post:
         raise HTTPException(404, "Post not found")
     return fix_id(post)
@@ -81,10 +86,10 @@ async def create_post(data: PostCreate, user=Depends(get_current_user)):
         **data.model_dump(),
         "slug": slugify(data.title),
         "author_id": str(user["_id"]),
-        "status": "draft",
+        "status": "published",
         "views": 0,
         "created_at": now,
-        "published_at": None,
+        "published_at": now,
     }
     result = await posts_col.insert_one(post)
     return {"id": str(result.inserted_id), "slug": post["slug"]}
