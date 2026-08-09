@@ -54,3 +54,9 @@ pnpm-debug.log*
 # Project Specific
 backend/.env
 frontend/.env
+
+# .gitignore
+.env
+.env.local
+backend/.env
+frontend/.env
